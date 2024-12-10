@@ -1,49 +1,29 @@
+import models
+
+from databaseEvents import dbEvents
+from databaseApplicantEvents import dbApplicantEvents
+from databaseUsers import dbUsers
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from repo import Database
+from database import Database
 
-import models
 
 app = FastAPI(
     title = "Applicants",
     docs_url= "/swagger"
 )
 
-d = Database()
-d.query(
-    '''create table if not exists events (
-        id integer primary key autoincrement,
-        name string,
-        desc string,
-        register bool,
-        event_date int
-        );
-    '''
-)
-
-d.query(
-    '''create table if not exists users (
-        id integer primary key autoincrement,
-        username string,
-        password string,
-        date_register int,
-        role tinyint
-        );
-    '''
-)
 
 @app.post("/login")
 def login(model: models.User):
-    cursor = Database().query(
-        f'''
-        select id from users where
-            username = \"{model.username}\" and
-            password = \"{model.password}\" and
-            role = {model.role}
-        '''
+
+    result = dbUsers().findUsers(
+        model.username,
+        model.password,
+        model.role
     )
 
-    result = cursor.fetchall()
     resultLen = len(result)
 
     if resultLen == 1:
@@ -64,91 +44,58 @@ def signin(model: models.User):
         return JSONResponse(
             "incorrect role",
             status_code=400)
+    
+    db = dbUsers()
 
-    Database().query(
-        f'''
-        insert into users (
-            username,
-            password,
-            date_register,
-            role
-        ) values (
-            \"{model.username}\",
-            \"{model.password}\",
-            DateTime('now'),
-            {model.role}
-
-        );
-        '''
+    db.addUser(
+        model.username,
+        model.password,
+        model.role
     )
 
-    cursor = Database().query(
-        f'''
-        select count(*) from users
-        '''
-    )
-
-    result = cursor.fetchone()
+    result = db.countUsers()
+    
     return JSONResponse(
-        result[0],
+        result,
         status_code=200
     )
 
 @app.get("/events")
 def events():
+    return dbEvents().getEvents()
 
-    out = []
-    result = Database().select("events")
+@app.post("/event/{eventId}/create")
+def create_event_form(
+    eventId: int,
+    model: models.EventForm):
 
-    for row in result:
-        out.append(
-            {
-                "id": row[0],
-               "name": row[1],
-                "desc": row[2],
-                "register": row[3],
-                "date": row[4]
-            }
-        )
+    dbApplicantEvents().createForm(
+        model.userId,
+        eventId
+    )
 
-    return out
-
-@app.put("/event/{id}/create")
-def createEventForm(
-    id: int):
-
-
-
-    return f"event {id}"
+    return JSONResponse(
+        status_code=200
+    )
 
 @app.post("/event/create")
 def create_event(model: models.EventInsert): 
-    Database().query(
-        f'''
-        insert into events (
-            name,
-            desc,
-            register,
-            event_date
-        ) values (
-            '{model.name}',
-            '{model.desc}',
-            {model.register},
-            {model.date}
-        );
-        '''
+    dbEvents().createEvent(
+        model.name,
+        model.desc,
+        model.register,
+        model.date,
+        model.university_id
     )
     return 
-
-@app.put("/event/applicant/{user_id}")
-def sendEventForm(
-    user_id: int):
-    return f"applicant {user_id}"
 
 @app.get("/events/{university_id}")
 def listUniversityEvents(
     university_id: int):
-    return f"university events {university_id}"
+
+    return dbEvents().getEventsByUniversity(
+        university_id
+    )
 
 @app.get("/event/{id}")
 def eventInfo(

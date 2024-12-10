@@ -1,7 +1,6 @@
 import sqlite3 as sql
 from typing import List
 
-
 class Database():
 
     cursor: sql.Cursor
