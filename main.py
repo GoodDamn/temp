@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from repo import Database
 
 import models
@@ -7,6 +8,7 @@ app = FastAPI(
     title = "Applicants",
     docs_url= "/swagger"
 )
+
 d = Database()
 d.query(
     '''create table if not exists events (
@@ -24,7 +26,8 @@ d.query(
         id integer primary key autoincrement,
         username string,
         password string,
-        date_register int
+        date_register int,
+        role tinyint
         );
     '''
 )
@@ -35,7 +38,8 @@ def login(model: models.User):
         f'''
         select id from users where
             username = \"{model.username}\" and
-            password = \"{model.password}\"
+            password = \"{model.password}\" and
+            role = {model.role}
         '''
     )
 
@@ -43,25 +47,36 @@ def login(model: models.User):
     resultLen = len(result)
 
     if resultLen == 1:
-        return result[0][0]
-
-    if resultLen == 0:
-        return "need to sign in"    
-
-    return None
+        return JSONResponse(
+            result[0][0],
+            status_code=200)
+    
+    return JSONResponse(
+        "need to sign in",
+        status_code=404)    
 
 @app.post("/signin")
 def signin(model: models.User):
+
+    # applicant
+    # employee
+    if model.role < 0 or model.role > 1:
+        return JSONResponse(
+            "incorrect role",
+            status_code=400)
+
     Database().query(
         f'''
         insert into users (
             username,
             password,
-            date_register
+            date_register,
+            role
         ) values (
             \"{model.username}\",
             \"{model.password}\",
-            DateTime('now')
+            DateTime('now'),
+            {model.role}
         );
         '''
     )
@@ -84,7 +99,7 @@ def events():
             }
         )
 
-    return str(out)
+    return out
 
 @app.put("/event/{id}/create")
 def createEventForm(

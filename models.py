@@ -1,9 +1,12 @@
 from pydantic import BaseModel
 
 
-class User(BaseModel):
+class UserAuth(BaseModel):
     username: str
     password: str
+
+class User(UserAuth):
+    role: int
 
 class EventInsert(BaseModel):
     name: str
