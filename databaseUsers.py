@@ -5,10 +5,8 @@ tableUsers = "users"
 
 class dbUsers():
 
-    database = Database()
-
     def countUsers(self):
-        cursor = self.database.query(
+        cursor = Database().query(
             f'''
                 select count(*) from {tableUsers}
             '''
@@ -22,12 +20,12 @@ class dbUsers():
         password: str,
         role: int):
 
-        cursor = self.database.query(
+        cursor = Database().query(
             f'''
-            select id from {repo.tableUsers} where
-                username = \"{model.username}\" and
-                password = \"{model.password}\" and
-                role = {model.role}
+            select id from {tableUsers} where
+                username = \"{username}\" and
+                password = \"{password}\" and
+                role = {role}
             '''
         )
 
@@ -39,7 +37,7 @@ class dbUsers():
         password: str,
         role: int):
 
-        self.database.query(
+        Database().query(
             f'''
             insert into {tableUsers} (
                 username,
@@ -58,7 +56,7 @@ class dbUsers():
         pass
 
     def createTable(self):
-        self.database.query(
+        Database().query(
             f'''create table if not exists {tableUsers} (
                 id integer primary key autoincrement,
                 username string,

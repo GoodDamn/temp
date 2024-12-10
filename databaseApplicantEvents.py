@@ -4,14 +4,12 @@ from database import Database
 tableApplicantEvents = "applicantEvents"
 
 class dbApplicantEvents():
-    
-    database = Database()
 
     def createForm(self,
         userId: int,
         eventId: int):
         
-        self.database.query(
+        Database().query(
             f'''
             insert into {tableApplicantEvents} (
                 userId,
@@ -24,7 +22,7 @@ class dbApplicantEvents():
         )
 
     def createTable(self):
-         self.database.query(
+         Database().query(
             f'''
                 create table if not exists {tableApplicantEvents} (
                     id integer primary key autoincrement,

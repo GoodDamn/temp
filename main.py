@@ -3,6 +3,7 @@ import models
 from databaseEvents import dbEvents
 from databaseApplicantEvents import dbApplicantEvents
 from databaseUsers import dbUsers
+from databaseUniversities import dbUniversities
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -14,6 +15,10 @@ app = FastAPI(
     docs_url= "/swagger"
 )
 
+dbEvents().createTable()
+dbApplicantEvents().createTable()
+dbUsers().createTable()
+dbUniversities().createTable()
 
 @app.post("/login")
 def login(model: models.User):
@@ -62,7 +67,10 @@ def signin(model: models.User):
 
 @app.get("/events")
 def events():
-    return dbEvents().getEvents()
+    return JSONResponse(
+        dbEvents().getEvents(),
+        status_code=200
+    )
 
 @app.post("/event/{eventId}/create")
 def create_event_form(
@@ -75,6 +83,7 @@ def create_event_form(
     )
 
     return JSONResponse(
+        None,
         status_code=200
     )
 
@@ -84,25 +93,63 @@ def create_event(model: models.EventInsert):
         model.name,
         model.desc,
         model.register,
-        model.date,
-        model.university_id
+        model.university_id,
+        model.date
     )
-    return 
+    return JSONResponse(
+        None,
+        status_code=200
+    )
 
 @app.get("/events/{university_id}")
 def listUniversityEvents(
     university_id: int):
 
-    return dbEvents().getEventsByUniversity(
-        university_id
+    return JSONResponse(
+        dbEvents().getEventsByUniversity(
+            university_id
+        ),
+        status_code=200
+    )
+
+@app.delete("/event/{id}")
+def delete_event(
+    id: int):
+    dbEvents().deleteEventById(
+        id
+    )
+
+    return JSONResponse(
+        None,
+        status_code=200
     )
 
 @app.get("/event/{id}")
-def eventInfo(
+def event_info(
     id: int):
-    return f"event info {id}"
+    return JSONResponse(
+        dbEvents().getEventById(
+            id
+        ),
+        status_code=200
+    )
 
-@app.put("/event/{id}/report")
-def create_Event_Report(
-    id: int):
-    return f"event report {id}"
+@app.get("/universities")
+def universities():
+    return JSONResponse(
+        dbUniversities().getUniversities(),
+        status_code=200
+    )
+
+@app.post("/university/create")
+def create_university(
+    model: models.University):
+    dbUniversities().createUniversity(
+        model.name,
+        model.desc
+    )
+
+    return JSONResponse(
+        None,
+        status_code=200
+    )

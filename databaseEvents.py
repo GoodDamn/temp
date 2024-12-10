@@ -4,8 +4,6 @@ from database import Database
 tableEvents = "events"
 
 class dbEvents():
-    
-    database = Database()
 
     def createEvent(
         self,
@@ -15,7 +13,7 @@ class dbEvents():
         university_id: int,
         date: int):
 
-        self.database.query(
+        Database().query(
             f'''
                 insert into {tableEvents} (
                     name,
@@ -24,8 +22,8 @@ class dbEvents():
                     event_date,
                     university_id
                 ) values (
-                    '{name}',
-                    '{desc}',
+                    \"{name}\",
+                    \"{desc}\",
                     {register},
                     {date},
                     {university_id}
@@ -33,9 +31,19 @@ class dbEvents():
             '''
         )
 
+    def deleteEventById(
+        self,
+        id: int):
+        Database().query(
+            f'''
+                delete from {tableEvents} where
+                    id = {id}
+            '''
+        )
+
     def getEvents(self):
         out = []
-        result = self.database.select(
+        result = Database().select(
             tableEvents
         )
 
@@ -53,12 +61,33 @@ class dbEvents():
            
         return out
 
+    def getEventById(
+        self,
+        eventId: int):
+        cursor = Database().query(
+            f'''
+                select * from {tableEvents} where
+                    id = {eventId};
+            '''
+        )
+
+        row = cursor.fetchone()
+
+        return {
+            "id": row[0],
+            "name": row[1],
+            "desc": row[2],
+            "register": row[3],
+            "date": row[4],
+            "university_id": row[5]
+        }
+
     def getEventsByUniversity(
         self,
         univereId: int):
 
         out = []
-        cursor = self.database.query(
+        cursor = Database().query(
             f'''
                 select * from {tableEvents} where
                     university_id = {univereId};
@@ -84,10 +113,7 @@ class dbEvents():
 
 
     def createTable(self):
-        self.database.query(
-            f"drop table if exists {tableEvents}"
-        )
-        self.database.query(
+        Database().query(
             f'''create table if not exists {tableEvents} (
                 id integer primary key autoincrement,
                 name string,

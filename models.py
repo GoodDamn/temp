@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 
+class University(BaseModel):
+    name: str
+    desc: str
+
 class EventForm(BaseModel):
     userId: int
 

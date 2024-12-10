@@ -5,26 +5,45 @@ tableUniversities = "universities"
 
 class dbUniversities():
 
-    database = Database()
-
     def createUniversity(self,
         name: str,
         desc: str):
 
-        self.database.query(
+        Database().query(
             f'''
                 insert into {tableUniversities} (
                     name,
                     desc
                 ) values (
-                    {name},
-                    {desc}
+                    \"{name}\",
+                    \"{desc}\"
                 );
             '''
         )
 
+    def getUniversities(self):
+        out = []
+        cursor = Database().query(
+            f'''
+                select * from {tableUniversities};
+            '''
+        )
+
+        result = cursor.fetchall()
+
+        for row in result:
+           out.append(
+                {
+                    "id": row[0],
+                    "name": row[1],
+                    "desc": row[2]
+                }
+            )
+           
+        return out
+
     def createTable(self):
-        self.database.query(
+        Database().query(
             f'''
                 create table if not exists {tableUniversities} (
                     id integer primary key autoincrement,
