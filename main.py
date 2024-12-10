@@ -53,7 +53,7 @@ def login(model: models.User):
     
     return JSONResponse(
         "need to sign in",
-        status_code=404)    
+        status_code=400)    
 
 @app.post("/signin")
 def signin(model: models.User):
@@ -77,10 +77,22 @@ def signin(model: models.User):
             \"{model.password}\",
             DateTime('now'),
             {model.role}
+
         );
         '''
     )
-    return 
+
+    cursor = Database().query(
+        f'''
+        select count(*) from users
+        '''
+    )
+
+    result = cursor.fetchone()
+    return JSONResponse(
+        result[0],
+        status_code=200
+    )
 
 @app.get("/events")
 def events():
