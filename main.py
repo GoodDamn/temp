@@ -141,6 +141,15 @@ def universities():
         status_code=200
     )
 
+@app.get("/university/{id}")
+def university_info(id: int):
+    return JSONResponse(
+        dbUniversities().getUniversityById(
+            id
+        ),
+        status_code=200
+    )
+
 @app.post("/university/create")
 def create_university(
     model: models.University):

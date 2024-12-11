@@ -21,6 +21,22 @@ class dbUniversities():
             '''
         )
 
+    def getUniversityById(self, id: int):
+        cursor = Database().query(
+            f'''
+            select * from {tableUniversities} where
+                id = {id}
+            '''
+        )
+
+        result = cursor.fetchone()
+
+        return {
+            "id": result[0],
+            "name": result[1],
+            "desc": result[2]
+        }
+
     def getUniversities(self):
         out = []
         cursor = Database().query(
