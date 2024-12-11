@@ -70,7 +70,7 @@ def user_info(
     userId: int):
     return JSONResponse(
         dbUsers().getUserInfoById(
-            id=id
+            id=userId
         ),
         status_code=200
     )
