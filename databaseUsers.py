@@ -1,5 +1,6 @@
 
 from database import Database
+from models import UserInfo
 
 tableUsers = "users"
 
@@ -13,6 +14,19 @@ class dbUsers():
         )
 
         return cursor.fetchone()[0]
+
+    def updateUserInfo(self,
+        model: UserInfo,
+        userId: int):
+        Database().query(
+            f'''
+            update {tableUsers} set firstName = \"{model.firstName}\",
+                surname = \"{model.surname}\",
+                secondName = \"{model.secondName}\",
+                isMale = {model.isMale}
+                where id = {userId};
+            '''
+        )
 
     def getUserInfoById(self, 
         id: int):

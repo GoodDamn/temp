@@ -67,11 +67,26 @@ def signin(model: models.User):
 
 @app.get("/user/{userId}")
 def user_info(
-    id: int):
+    userId: int):
     return JSONResponse(
         dbUsers().getUserInfoById(
             id=id
         ),
+        status_code=200
+    )
+
+@app.put("/user/{userId}/update")
+def update_user_info(
+    userId: int,
+    model: models.UserInfo):
+    
+    dbUsers().updateUserInfo(
+        model,
+        userId=userId
+    )
+    
+    return JSONResponse(
+        None,
         status_code=200
     )
 

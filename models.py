@@ -14,6 +14,12 @@ class UserAuth(BaseModel):
 class User(UserAuth):
     role: int
 
+class UserInfo(BaseModel):
+    firstName: str
+    secondName: str
+    surname: str
+    isMale: bool
+
 class EventInsert(BaseModel):
     name: str
     desc: str
