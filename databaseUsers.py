@@ -14,6 +14,26 @@ class dbUsers():
 
         return cursor.fetchone()[0]
 
+    def getUserInfoById(self, 
+        id: int):
+        cursor = Database().query(
+            f'''
+            select * from {tableUsers} where
+                id = {id}
+            '''
+        )
+
+        r = cursor.fetchone()
+
+        return {
+            "id": r[0],
+            "date": r[3],
+            "firstName": r[5],
+            "secondName": r[6],
+            "surname": r[7],
+            "isMale": r[8]
+        }
+
     def findUsers(
         self,
         username: str,
@@ -55,6 +75,11 @@ class dbUsers():
 
         pass
 
+    def dropTable(self):
+        Database().query(
+            f"drop table if exists {tableUsers}"
+        )
+    
     def createTable(self):
         Database().query(
             f'''create table if not exists {tableUsers} (
@@ -62,7 +87,11 @@ class dbUsers():
                 username string,
                 password string,
                 date_register int,
-                role tinyint
+                role tinyint,
+                firstName string,
+                secondName string,
+                surname string,
+                isMale bool
             );
             '''
         )

@@ -65,11 +65,42 @@ def signin(model: models.User):
         status_code=200
     )
 
+@app.get("/user/{userId}")
+def user_info(
+    id: int):
+    return JSONResponse(
+        dbUsers().getUserInfoById(
+            id=id
+        ),
+        status_code=200
+    )
+
 @app.get("/events")
 def events():
     return JSONResponse(
         dbEvents().getEvents(),
         status_code=200
+    )
+
+@app.get("/event/{eventId}/check/{userId}")
+def check_form(
+    eventId: int,
+    userId: int):
+
+    hasUserForm = dbApplicantEvents().hasUserForm(
+        eventId=eventId,
+        userId=userId
+    )
+
+    if hasUserForm:
+        return JSONResponse(
+            None,
+            status_code=200
+        ) 
+
+    return JSONResponse(
+        None,
+        status_code=404
     )
 
 @app.post("/event/{eventId}/create")
@@ -83,7 +114,7 @@ def create_event_form(
     )
 
     return JSONResponse(
-        None,
+        "Запись успешна",
         status_code=200
     )
 
@@ -102,7 +133,7 @@ def create_event(model: models.EventInsert):
     )
 
 @app.get("/events/{university_id}")
-def listUniversityEvents(
+def get_university_events(
     university_id: int):
 
     return JSONResponse(

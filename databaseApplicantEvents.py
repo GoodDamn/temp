@@ -5,6 +5,23 @@ tableApplicantEvents = "applicantEvents"
 
 class dbApplicantEvents():
 
+    def hasUserForm(
+        self,
+        eventId: int,
+        userId: int) -> bool:
+
+        cursor = Database().query(
+            f'''
+            select count(*) from {tableApplicantEvents} where
+                eventId = {eventId} and
+                userId = {userId} 
+            '''
+        )
+
+        result = cursor.fetchone()
+
+        return result[0] == 1
+
     def createForm(self,
         userId: int,
         eventId: int):
