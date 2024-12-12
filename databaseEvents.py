@@ -103,8 +103,7 @@ class dbEvents():
                     "name": row[1],
                     "desc": row[2],
                     "register": row[3],  
-                    "date": row[4],
-                    "university_id": row[5]
+                    "date": row[4]
                 }
             )
            

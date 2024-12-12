@@ -147,17 +147,6 @@ def create_event(model: models.EventInsert):
         status_code=200
     )
 
-@app.get("/events/{university_id}")
-def get_university_events(
-    university_id: int):
-
-    return JSONResponse(
-        dbEvents().getEventsByUniversity(
-            university_id
-        ),
-        status_code=200
-    )
-
 @app.delete("/event/{id}")
 def delete_event(
     id: int):
@@ -173,10 +162,19 @@ def delete_event(
 @app.get("/event/{id}")
 def event_info(
     id: int):
+
+    event = dbEvents().getEventById(id)
+    
+    university = dbUniversities().getUniversityById(
+        event["university_id"]
+    )
+
+    del event["university_id"]
+
+    event["university"] = university
+
     return JSONResponse(
-        dbEvents().getEventById(
-            id
-        ),
+        event,
         status_code=200
     )
 
@@ -189,10 +187,19 @@ def universities():
 
 @app.get("/university/{id}")
 def university_info(id: int):
+
+    events = dbEvents().getEventsByUniversity(
+        univereId=id
+    )
+
+    university = dbUniversities().getUniversityById(
+        id
+    )
+
+    university["events"] = events
+    
     return JSONResponse(
-        dbUniversities().getUniversityById(
-            id
-        ),
+        university,
         status_code=200
     )
 
